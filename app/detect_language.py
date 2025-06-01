@@ -1,6 +1,7 @@
+
 from faster_whisper import WhisperModel
 
-model = WhisperModel("small", compute_type="int8", device="cpu")
+model = WhisperModel("small", compute_type="int8", device="cpu", local_files_only=False)
 
 lang_names = {
     "af": "Tiếng Afrikaans", "am": "Tiếng Amhara", "ar": "Tiếng Ả Rập", "as": "Tiếng Assam",
@@ -27,9 +28,15 @@ lang_names = {
 }
 
 def detect_language(audio_path: str):
-    segments, result = model.transcribe(audio_path)
-    code = result.language
-    return {
-        "language_code": code,
-        "language_name": lang_names.get(code, f"Mã không xác định: {code}")
-    }
+    segments, info = model.transcribe(audio_path)
+
+    code = info.language
+    name = lang_names.get(code, f"Mã không xác định: {code}")
+    print(f"\n Ngôn ngữ bạn đang nói là: {name}")
+
+    print("\n Nội dung được ghi âm:")
+    text = ""
+    for segment in segments:
+        print(segment.text.strip())
+        text+=segment.text.strip() + " "
+    return code,text    
